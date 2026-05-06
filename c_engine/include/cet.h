@@ -53,6 +53,7 @@ void cet_execute_hcet(const cet_graph_t* g, const cet_query_t* q, size_t switch_
 
 size_t cet_materialize_windows(int64_t start, int64_t end, int64_t within, int64_t slide, int64_t out[][2], size_t cap);
 void cet_estimate_costs(cet_graphlet_t* arr, size_t n);
+void cet_set_cost_coefficients(double mem_vertex, double mem_edge, double cpu_edge, double cpu_vertex);
 size_t cet_detect_graphlets(int64_t windows[][2], size_t nwin, cet_graphlet_t* out, size_t cap);
 void cet_greedy_plan(const cet_graphlet_t* gl, size_t n, double max_mem, cet_plan_t* out);
 void cet_branch_and_bound_plan(const cet_graphlet_t* gl, size_t n, double max_mem, cet_plan_t* out);

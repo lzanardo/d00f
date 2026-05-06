@@ -20,8 +20,17 @@ def trend_id(partition_key: str, path: list[int]) -> str:
     return hashlib.sha256(f"{QUERY_VERSION}:{partition_key}:{','.join(map(str, path))}".encode()).hexdigest()
 
 
+def load_coefficients(bridge):
+    try:
+        row = spark.table(f"{CATALOG}.{SCHEMA}.cet_optimizer_coefficients").orderBy(F.col("calibrated_at").desc()).first()
+        if row is not None:
+            bridge.set_cost_coefficients(float(row.mem_coef), float(row.mem_coef if hasattr(row, "mem_edge") else 0.3), float(row.cpu_coef), 0.2)
+    except Exception:
+        pass
+
 def process_partition(rows):
     bridge = CETBridge()
+    load_coefficients(bridge)
     query_obj = bridge.parse_query("security", "AuthFail+,PrivEsc,DataAccess", 30 * 60 * 1000, 5 * 60 * 1000)
     bucket = {}
     for r in rows:

@@ -62,6 +62,7 @@ class CETBridge:
         self.lib.cet_graph_add_vertex.argtypes = [ctypes.POINTER(CETGraph), ctypes.c_int, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int64]
         self.lib.cet_graph_add_edge.argtypes = [ctypes.POINTER(CETGraph), ctypes.c_int, ctypes.c_int, ctypes.c_int64, ctypes.c_int64]
         self.lib.cet_execute_hcet.argtypes = [ctypes.POINTER(CETGraph), ctypes.POINTER(CETQuery), ctypes.c_size_t, ctypes.POINTER(CETResult)]
+        self.lib.cet_set_cost_coefficients.argtypes = [ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double]
 
     def parse_query(self, name: str, seq_csv: str, within_ms: int, slide_ms: int) -> CETQuery:
         q = CETQuery()
@@ -80,3 +81,6 @@ class CETBridge:
         out = CETResult()
         self.lib.cet_execute_hcet(ctypes.byref(g), ctypes.byref(query), switch_depth, ctypes.byref(out))
         return CETMatch(paths=[[out.paths[i][j] for j in range(out.path_len[i])] for i in range(out.count)])
+
+    def set_cost_coefficients(self, mem_vertex: float, mem_edge: float, cpu_edge: float, cpu_vertex: float) -> None:
+        self.lib.cet_set_cost_coefficients(mem_vertex, mem_edge, cpu_edge, cpu_vertex)
