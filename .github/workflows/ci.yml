@@ -1,0 +1,41 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build and test
+        run: |
+          cmake -S . -B build
+          cmake --build build
+          ctest --test-dir build --output-on-failure
+      - name: Integration smoke
+        run: ./ci/integration_smoke.sh
+      - name: Fault injection
+        run: ./ci/fault_injection.sh
+      - name: Perf gate
+        run: ./ci/perf_gate.sh
+      - name: Property semantics
+        run: |
+          export PYTHONPATH=.
+          python tests/property_semantics_test.py
+      - name: Golden replay
+        run: |
+          export PYTHONPATH=.
+          python tests/golden_replay_test.py
+      - name: Migration contract check
+        run: ./ci/migration_check.sh
+      - name: Replay flow asset test
+        run: |
+          export PYTHONPATH=.
+          python tests/e2e_replay_flow_test.py
+      - name: Release attestation
+        run: ./ci/release_attestation.sh
+      - name: Soak (short)
+        run: |
+          export PYTHONPATH=.
+          for i in 1 2 3; do python benchmarks/harness.py; done
