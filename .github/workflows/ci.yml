@@ -14,8 +14,8 @@ jobs:
           cmake --build build
           ctest --test-dir build --output-on-failure
       - name: Integration smoke
-        run: |
-          ./ci/integration_smoke.sh
-      - name: Perf smoke
-        run: |
-          python benchmarks/harness.py
+        run: ./ci/integration_smoke.sh
+      - name: Fault injection
+        run: ./ci/fault_injection.sh
+      - name: Perf gate
+        run: ./ci/perf_gate.sh

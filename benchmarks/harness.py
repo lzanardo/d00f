@@ -1,27 +1,23 @@
 from time import perf_counter
-
-from oxdsi_cet.dsl import parse_query
-from oxdsi_cet.engine import CETEngine
-from oxdsi_cet.graph_model import CETGraph, EventEdge, EventVertex
+from bindings.python.bridge import CETBridge
 
 
-def synthetic_graph(n=2000):
-    from datetime import datetime, timedelta
-
-    g = CETGraph()
-    t0 = datetime.utcnow()
+def run(mode="h-cet", n=5000):
+    bridge = CETBridge("build/liboxdsi_cet.so")
+    q = bridge.parse_query("bench", "A,B,C", 60000, 10000)
+    events = []
+    edges = []
     for i in range(n):
-        typ = ["A", "B", "C"][i % 3]
-        g.add_vertex(EventVertex(str(i), "acct1", typ, t0 + timedelta(seconds=i), {"v": i}))
+        t = ["A", "B", "C"][i % 3]
+        events.append((i + 1, "acct", t, i + 1))
         if i > 0:
-            g.add_edge(EventEdge(str(i - 1), str(i), "acct1", t0, t0 + timedelta(seconds=n)))
-    return g
+            edges.append((i, i + 1, 0, n + 1))
+    t0 = perf_counter()
+    out = bridge.run_hcet(q, events, edges)
+    dt = perf_counter() - t0
+    return len(out.paths), dt
 
 
 if __name__ == "__main__":
-    g = synthetic_graph()
-    q = parse_query("bench", ["A", "B", "C"], 600, 60)
-    for mode in ["m-cet", "t-cet", "h-cet"]:
-        t = perf_counter()
-        out = CETEngine(mode).execute(g, q)
-        print(mode, len(out), perf_counter() - t)
+    paths, seconds = run()
+    print(f"paths={paths} seconds={seconds:.6f}")

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+export PYTHONPATH=.
 python - <<'PY'
 from bindings.python.bridge import CETBridge
 b=CETBridge('build/liboxdsi_cet.so')
