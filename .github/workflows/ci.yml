@@ -19,3 +19,11 @@ jobs:
         run: ./ci/fault_injection.sh
       - name: Perf gate
         run: ./ci/perf_gate.sh
+      - name: Golden replay
+        run: |
+          export PYTHONPATH=.
+          python tests/golden_replay_test.py
+      - name: Soak (short)
+        run: |
+          export PYTHONPATH=.
+          for i in 1 2 3; do python benchmarks/harness.py; done

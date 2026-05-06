@@ -14,8 +14,10 @@ spark.sql(f"CREATE TABLE IF NOT EXISTS {CATALOG}.{SCHEMA}.cet_metrics (batch_id 
 spark.sql(f"CREATE TABLE IF NOT EXISTS {CATALOG}.{SCHEMA}.cet_dead_letter (batch_id BIGINT, partition_key STRING, error STRING, payload STRING, created_at TIMESTAMP) USING DELTA")
 
 
+QUERY_VERSION = "v1"
+
 def trend_id(partition_key: str, path: list[int]) -> str:
-    return hashlib.sha256(f"{partition_key}:{','.join(map(str, path))}".encode()).hexdigest()
+    return hashlib.sha256(f"{QUERY_VERSION}:{partition_key}:{','.join(map(str, path))}".encode()).hexdigest()
 
 
 def process_partition(rows):
