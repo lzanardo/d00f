@@ -23,3 +23,6 @@
 - Replace fixed arrays with pooled arena/CSR adjacency.
 - Persist T-CET partial-cache state across batches/windows.
 - Calibrate cost model from observed runtime telemetry.
+
+- Cost calibration job: `jobs/calibrate_cost_model.py`.
+- Alert deployment hook: `dashboards/deploy_alerts.py`.
